@@ -1,8 +1,7 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useFormState } from "react-dom";
-//import { useActionState } from "react";
-
 import ImagePicker from "@/components/meals/image-picker";
 import classes from "./page.module.css";
 import { shareMeal } from "@/lib/actions";
@@ -10,7 +9,23 @@ import MealsFormSubmit from "@/components/meals/meals-form-submit";
 
 export default function ShareMealPage() {
   const [state, formAction] = useFormState(shareMeal, { message: null });
-  //const [state, formAction] = useActionState(shareMeal, { message: null });
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
+  function handleFilesChange(files) {
+    setSelectedFiles(files);
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+
+    selectedFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    await formAction(formData);
+  }
 
   return (
     <>
@@ -21,7 +36,7 @@ export default function ShareMealPage() {
         <p>Or any other meal you feel needs sharing!</p>
       </header>
       <main className={classes.main}>
-        <form className={classes.form} action={formAction}>
+        <form className={classes.form} onSubmit={handleSubmit}>
           <div className={classes.row}>
             <p>
               <label htmlFor='name'>Your name</label>
@@ -49,7 +64,11 @@ export default function ShareMealPage() {
               required
             ></textarea>
           </p>
-          <ImagePicker label='Your image' name='image' />
+          <ImagePicker
+            label='Your images'
+            name='image'
+            onFilesChange={handleFilesChange}
+          />
           {state.message && <p>{state.message}</p>}
           <p className={classes.actions}>
             <MealsFormSubmit />
