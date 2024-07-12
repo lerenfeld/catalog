@@ -6,6 +6,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import classes from "./meal-item.module.css";
+// import ReactImageGallery from "react-image-gallery";
 
 export default function MealItem({
   title,
@@ -22,9 +23,20 @@ export default function MealItem({
     return null; // Or handle accordingly if images is not an array
   }
 
+  const galleryFormatImages = images.map((image) => {
+    return {
+      original: `${imageBaseUrl}${image}`,
+      thumbnail: `${imageBaseUrl}${image}`,
+    };
+  });
+
   return (
     <article className={classes.meal}>
       <header>
+        {/* <div>
+          <ReactImageGallery items={galleryFormatImages} />
+        </div> */}
+
         <div className={classes.carouselContainer}>
           <Carousel showArrows={true} showThumbs={false} dynamicHeight={true}>
             {images.map((image, index) => (
@@ -39,6 +51,7 @@ export default function MealItem({
             ))}
           </Carousel>
         </div>
+
         <div className={classes.headerText}>
           <h2>{title}</h2>
           <p>by {creator}</p>
