@@ -28,7 +28,7 @@ export default async function MealDetailsPage({ params }) {
   return (
     <>
       <div className='flex  justify-center gap-8 '>
-        <div className='fill'>
+        <div className='h-[500px] w-[500px]'>
           <MealSlugCarousel2 meal={meal} />
         </div>
         <div>
