@@ -5,8 +5,9 @@ import Image from "next/image";
 
 import classes from "./image-picker.module.css";
 
-export default function ImagePicker({ label, name }) {
-  const [pickedImage, setPickedImage] = useState();
+export default function ImagePicker({ label, name, onFilesChange }) {
+  const [pickedImages, setPickedImages] = useState([]);
+  const [files, setFiles] = useState([]);
   const imageInput = useRef();
 
   function handlePickClick() {
@@ -14,36 +15,28 @@ export default function ImagePicker({ label, name }) {
   }
 
   function handleImageChange(event) {
-    const file = event.target.files[0];
+    const selectedFiles = Array.from(event.target.files);
+    setFiles(selectedFiles);
 
-    if (!file) {
-      setPickedImage(null);
+    if (selectedFiles.length === 0) {
+      setPickedImages([]);
       return;
     }
 
-    const fileReader = new FileReader();
+    // Create an array of image URLs for preview
+    const imagePreviews = selectedFiles.map((file) =>
+      URL.createObjectURL(file)
+    );
+    setPickedImages(imagePreviews);
 
-    fileReader.onload = () => {
-      setPickedImage(fileReader.result);
-    };
-
-    fileReader.readAsDataURL(file);
+    // Pass the files to the parent component
+    onFilesChange(selectedFiles);
   }
 
   return (
     <div className={classes.picker}>
       <label htmlFor={name}>{label}</label>
       <div className={classes.controls}>
-        <div className={classes.preview}>
-          {!pickedImage && <p>No image picked yet.</p>}
-          {pickedImage && (
-            <Image
-              src={pickedImage}
-              alt='The image selected by the user.'
-              fill
-            />
-          )}
-        </div>
         <input
           className={classes.input}
           type='file'
@@ -53,14 +46,30 @@ export default function ImagePicker({ label, name }) {
           ref={imageInput}
           onChange={handleImageChange}
           required
+          multiple={true}
         />
         <button
           className={classes.button}
           type='button'
           onClick={handlePickClick}
         >
-          Pick an Image
+          Pick Images
         </button>
+
+        {files && files.length > 0 && <span>{files.length} תמונות נבחרו</span>}
+      </div>
+
+      <div className={classes.previews}>
+        {pickedImages.map((src, index) => (
+          <div className={classes.preview} key={index}>
+            <Image
+              src={src}
+              alt={`Selected image ${index + 1}`}
+              layout='fill'
+              objectFit='cover'
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
